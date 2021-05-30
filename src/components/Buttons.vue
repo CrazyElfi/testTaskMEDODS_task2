@@ -17,7 +17,6 @@
               @click="newGame">Start!
       </button>
 
-      <p>{{ randomArr }}</p>
       <div class="game-options">
         <h2>Game Options:</h2>
         <div class="lvl-wrapper"
@@ -31,13 +30,7 @@
                  :value="level.id"
                  :id="level.id"
           >
-          <!--        v-on:change="listenerChoiceLevel"-->
           <label for="level.id">{{ level.name }}</label>
-
-
-          <!-- &lt;!&ndash;<input type="radio" name="mode" value="easy" checked> Easy Level&ndash;&gt;-->
-          <!--&lt;!&ndash;<input type="radio" name="mode" value="middle"> Middle level&ndash;&gt;-->
-          <!--&lt;!&ndash;<input type="radio" name="mode" value="hard"> Hard level&ndash;&gt;-->
         </div>
 
       </div>
@@ -56,6 +49,7 @@ let levels = [
   {id: "lvl_2", value: "middle", name: "Middle level", timeBreak: 1000},
   {id: "lvl_3", value: "hard", name: "Hard level", timeBreak: 400},
 ];
+
 export default {
   name: 'Buttons',
   props: {
@@ -98,7 +92,7 @@ export default {
         //sound
         await this.playSound(id)
 
-        await this.sleep(this.selectedLevel.time)
+        await this.sleep(this.selectedLevel.timeBreak)
         this.removeHighlight(id)
         await this.sleep(700)
       }
@@ -118,24 +112,27 @@ export default {
       btn.classList.remove("highlight")
     },
     async listenerStepUser(e) {
-      let clickId = Number(e.target.id)
+      if(this.isDisabledBtnStart) {
+        let clickId = Number(e.target.id)
 
-      await this.playSound(clickId)
+        await this.playSound(clickId)
 
-      if (clickId === this.randomArr[this.step]) {
-        this.step++
-      } else {
-        alert('Game over! =(')
-        this.isDisabledBtnStart = false
-        this.round = 1
-        this.randomArr = []
+        if (clickId === this.randomArr[this.step]) {
+          this.step++
+        } else {
+          alert('Game over! =(')
+          this.isDisabledBtnStart = false
+          this.round = 1
+          this.randomArr = []
+        }
+
+        if (this.step === this.randomArr.length) {
+          this.round++
+          this.step = 0
+          this.newGame()
+        }
       }
 
-      if (this.step === this.randomArr.length) {
-        this.round++
-        this.step = 0
-        this.newGame()
-      }
     },
     async playSound(id) {
       let index = id - 1
@@ -146,17 +143,6 @@ export default {
         await audio.play();
       }
     },
-    // listenerChoiceLevel(e) {
-    //   console.log('listenerChoiceLevel', e.target.id)
-    //   let clickLvlId = e.target.id
-    //
-    //   let lvlObj = this.levelArr.find(item => item.id === clickLvlId)
-    //   console.log('listener2', lvlObj)
-    //   console.log('this.selectedLevelTime before', this.selectedLevelTime)
-    //
-    //   this.selectedLevelTime = lvlObj.timeBreak
-    //   console.log('this.selectedLevelTime', this.selectedLevelTime)
-    // }
   }
 }
 </script>
